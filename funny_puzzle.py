@@ -1,6 +1,8 @@
 import heapq
 
 
+DEBUG = False 
+
 succ_lookup = {
 	(0, 0): [(0, 1), (1, 0)],
 	(0, 1): [(0, 0), (0, 2), (1, 1)],
@@ -127,38 +129,55 @@ def solver(state):
 	initial_parent_index = -1
 	initial_priority = initial_g + initial_h
 	heapq.heappush(pq, (initial_priority, state, (initial_g, initial_h, initial_parent_index)))	
-	
+	visited = []	
+
 	while len(pq) > 0:
 		state = heapq.heappop(pq)
-#		print(state[1])
+		visited.append(state[1])
+		if DEBUG:
+			print(f'{idx} {state[1]}')
+			#print(f'visited list: {visited}')				
 		if state[1] == goal_state:
 #			print("reached goal_state")
 			break
 		idx_table[idx] = state
 		succ_states = get_succ(state[1])
+		
 		for succ in succ_states:
+			if succ in visited:
+				if DEBUG:
+					print(f"{succ} already visited")
+				continue
 			h = get_manhattan_distance(succ)
-			g = moves + 1
+			g = state[2][0] + 1
 			parent_index = idx
 			priority = g + h
 			heapq.heappush(pq, (priority, succ, (g, h, parent_index)))
+			if DEBUG:
+				print(f'\t{succ} h = {h}, g = {g}')
 		moves += 1
 		idx += 1					
-					
-#	print(f'idx table: {idx_table}')
+			
+	if DEBUG:		
+		print(f'idx table: {idx_table}')
 
 	stack = []
 	curr_state = state
 	parent_index = curr_state[2][2]
-#	print(parent_index)
-#	print(f'current state: {curr_state}')
+	if DEBUG:
+		print(f'Parent index of goal state: {parent_index}')
+		print(f'current state: {curr_state}')
 	while parent_index != -1:
 		stack.append(curr_state)
 		curr_state = idx_table[parent_index]
 		parent_index = curr_state[2][2]
-#		print(parent_index)	
+		if DEBUG:
+			print(f'Parent index: {parent_index}')	
+			print(f'state: {curr_state}')
 	stack.append(curr_state)
-#	print(stack)
+	
+	if DEBUG:
+		print(stack)
 	
 	while len(stack) > 0:
 		item = stack.pop()
@@ -173,8 +192,10 @@ def main():
 #	state = [1, 2, 3, 4, 5, 6, 7, 0, 8]	
 #	state = [8,7,6,5,4,3,2,1,0]
 #	state = [1,2,3,4,5,0,6,7,8]
-	state = [1,2,3,4,5,6,7,0,8]
+	state = [4,3,8,5,1,6,7,2,0]
+#	state = [1,2,3,4,5,6,7,0,8]
 #	print_succ(state)
+	
 
 	solver(state)
 
