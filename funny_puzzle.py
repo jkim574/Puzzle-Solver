@@ -1,3 +1,5 @@
+import heapq
+
 
 succ_lookup = {
 	(0, 0): [(0, 1), (1, 0)],
@@ -24,6 +26,8 @@ goal_coordinates = {
 	8: (2, 1),
 	0: (2, 2)
 }
+
+goal_state = [1, 2, 3, 4, 5, 6, 7, 8, 0]
 
 
 def get_r_c_tuple(index):
@@ -81,6 +85,13 @@ def get_manhattan_distance(state):
 
 
 def print_succ(state):
+	sorted_succ_list = get_succ(state)
+	for succ in sorted_succ_list:
+		h = get_manhattan_distance(succ)
+		print(f'{succ} h={h}')
+
+
+def get_succ(state):
 	# Find the index of 0 from state (Python list)
 	idx = state.index(0)
 #	print(f'index: {idx}')
@@ -102,29 +113,48 @@ def print_succ(state):
 	
 	sorted_succ_list = sorted(succ_list)
 
-	#for item in sorted_succ_list:
-	#	print(item)
-
-	for succ in sorted_succ_list:
-		h = get_manhattan_distance(succ)
-		print(f'{succ} h={h}')
+	return sorted_succ_list
 
 
 
 def solver(state):
-	pass
+	moves = 0
+	idx = 0
+	pq = []
+	initial_g = 0
+	initial_h = get_manhattan_distance(state)
+	initial_parent_index = -1
+	initial_priority = initial_g + initial_h
+	heapq.heappush(pq, (initial_priority, state, (initial_g, initial_h, initial_parent_index)))	
+	
+	while len(pq) > 0:
+		state = heapq.heappop(pq)
+		print(state[1])
+		if state[1] == goal_state:
+			print("reached goal_state")
+			break
+		succ_states = get_succ(state[1])
+		for succ in succ_states:
+			h = get_manhattan_distance(succ)
+			g = moves + 1
+			parent_index = idx
+			priority = g + h
+			heapq.heappush(pq, (priority, succ, (g, h, parent_index)))
+		moves += 1
+		idx += 1					
+					
+
+
 
 
 def main():
-	#state = [1, 2, 3, 4, 5, 6, 7, 0, 8]	
-	state = [1,2,3,4,5,0,6,7,8]
-	print_succ(state)
-	'''
-	for i in range(9):
-		rc = get_r_c_tuple(i)
-		print(rc)
-	'''
+#	state = [1, 2, 3, 4, 5, 6, 7, 0, 8]	
+#	state = [8,7,6,5,4,3,2,1,0]
+#	state = [1,2,3,4,5,0,6,7,8]
+	state = [1,2,3,4,5,6,7,0,8]
+#	print_succ(state)
 
+	solver(state)
 
 if __name__ == '__main__':
 	main()
