@@ -120,6 +120,7 @@ def get_succ(state):
 def solver(state):
 	moves = 0
 	idx = 0
+	idx_table = {}
 	pq = []
 	initial_g = 0
 	initial_h = get_manhattan_distance(state)
@@ -129,10 +130,11 @@ def solver(state):
 	
 	while len(pq) > 0:
 		state = heapq.heappop(pq)
-		print(state[1])
+#		print(state[1])
 		if state[1] == goal_state:
-			print("reached goal_state")
+#			print("reached goal_state")
 			break
+		idx_table[idx] = state
 		succ_states = get_succ(state[1])
 		for succ in succ_states:
 			h = get_manhattan_distance(succ)
@@ -143,8 +145,28 @@ def solver(state):
 		moves += 1
 		idx += 1					
 					
+#	print(f'idx table: {idx_table}')
 
-
+	stack = []
+	curr_state = state
+	parent_index = curr_state[2][2]
+#	print(parent_index)
+#	print(f'current state: {curr_state}')
+	while parent_index != -1:
+		stack.append(curr_state)
+		curr_state = idx_table[parent_index]
+		parent_index = curr_state[2][2]
+#		print(parent_index)	
+	stack.append(curr_state)
+#	print(stack)
+	
+	while len(stack) > 0:
+		item = stack.pop()
+		state = item[1]
+		g = item[2][0]
+		h = item[2][1]
+		print(f'{state} h = {h} moves: {g}')
+	
 
 
 def main():
