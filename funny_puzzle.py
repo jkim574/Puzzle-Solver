@@ -3,18 +3,18 @@ import heapq
 
 class Solution:
 
-	DEBUG = False 
+	DEBUG = False
 
 	succ_lookup = {
 		(0, 0): [(0, 1), (1, 0)],
 		(0, 1): [(0, 0), (0, 2), (1, 1)],
 		(0, 2): [(0, 1), (1, 2)],
-		(1, 0): [(0, 0), (1, 1), (2, 0)],	
-		(1, 1): [(0, 1), (1, 0), (1, 2), (2, 1)],	
-		(1, 2): [(0, 2), (1, 1), (2, 2)],	
-		(2, 0): [(1, 0), (2, 1)],	
-		(2, 1): [(1, 1), (2, 0), (2, 2)],	
-		(2, 2): [(1, 2), (2, 1)]	
+		(1, 0): [(0, 0), (1, 1), (2, 0)],
+		(1, 1): [(0, 1), (1, 0), (1, 2), (2, 1)],
+		(1, 2): [(0, 2), (1, 1), (2, 2)],
+		(2, 0): [(1, 0), (2, 1)],
+		(2, 1): [(1, 1), (2, 0), (2, 2)],
+		(2, 2): [(1, 2), (2, 1)]
 	}
 	# size means n in n x n board
 	size = 3
@@ -44,14 +44,14 @@ class Solution:
 
 	@staticmethod
 	def swap(state, src, dst):
-		"""Given a 1D list, swap the values in src and dst indices. 
+		"""Given a 1D list, swap the values in src and dst indices.
 		src and dst indices are in (r, c) form.
 		"""
 		# Convert src and dst (r, c) form to list index
-		src_idx = src[0] * Solution.size + src[1] 
+		src_idx = src[0] * Solution.size + src[1]
 		dst_idx = dst[0] * Solution.size + dst[1]
 
-		#print(f'Before swap: {state}')	
+		#print(f'Before swap: {state}')
 
 		#print(src_idx, dst_idx)
 		tmp = state[src_idx]
@@ -64,14 +64,14 @@ class Solution:
 	@staticmethod
 	def manhattan(curr_coordinate, goal_coordinate):
 		"""Calculate the manhattan distance from current coordinate (r,c) to goal coordinate (r,c)."""
-		r1 = curr_coordinate[0] 
+		r1 = curr_coordinate[0]
 		c1 = curr_coordinate[1]
 
 		r2 = goal_coordinate[0]
 		c2 = goal_coordinate[1]
 
 		distance = abs(r2 - r1) + abs(c2 - c1)
-		return distance 
+		return distance
 
 
 	@staticmethod
@@ -85,7 +85,7 @@ class Solution:
 				continue
 			curr_coordinate = Solution.get_r_c_tuple(idx)
 			goal_coordinate = Solution.goal_coordinates[tile]
-			h = Solution.manhattan(curr_coordinate, goal_coordinate)	
+			h = Solution.manhattan(curr_coordinate, goal_coordinate)
 			#print(f'Tile {tile}: {curr_coordinate} -> {goal_coordinate} h = {h}')
 			total_sum += h
 		return total_sum
@@ -111,15 +111,15 @@ class Solution:
 
 		# Look up successor indices from succ_lookup dictionary by using the (r, c) tuple
 		succ_indices = Solution.succ_lookup[index_tuple]
-	#	print(f'sucessor index tuples: {succ_indices}')	
-		
+	#	print(f'sucessor index tuples: {succ_indices}')
+
 		succ_list = []
 		# For each successor index, create a copy of state and swap the 0
 		for swap_idx in succ_indices:
 			state_cp = state[:]
-			Solution.swap(state_cp, index_tuple, swap_idx)	
+			Solution.swap(state_cp, index_tuple, swap_idx)
 			succ_list.append(state_cp)
-		
+
 		sorted_succ_list = sorted(succ_list)
 
 		return sorted_succ_list
@@ -135,21 +135,21 @@ class Solution:
 		initial_h = Solution.get_manhattan_distance(state)
 		initial_parent_index = -1
 		initial_priority = initial_g + initial_h
-		heapq.heappush(pq, (initial_priority, state, (initial_g, initial_h, initial_parent_index)))	
-		visited = []	
+		heapq.heappush(pq, (initial_priority, state, (initial_g, initial_h, initial_parent_index)))
+		visited = []
 
 		while len(pq) > 0:
 			state = heapq.heappop(pq)
 			visited.append(state[1])
 			if Solution.DEBUG:
 				print(f'{idx} {state[1]}')
-				#print(f'visited list: {visited}')				
+				#print(f'visited list: {visited}')
 			if state[1] == Solution.goal_state:
 	#			print("reached goal_state")
 				break
 			idx_table[idx] = state
 			succ_states = Solution.get_succ(state[1])
-			
+
 			for succ in succ_states:
 				if succ in visited:
 					if Solution.DEBUG:
@@ -158,14 +158,13 @@ class Solution:
 				h = Solution.get_manhattan_distance(succ)
 				g = state[2][0] + 1
 				parent_index = idx
-				priority = g + h
-				heapq.heappush(pq, (priority, succ, (g, h, parent_index)))
+				priority = g + h				heapq.heappush(pq, (priority, succ, (g, h, parent_index)))
 				if Solution.DEBUG:
 					print(f'\t{succ} h = {h}, g = {g}')
 			moves += 1
-			idx += 1					
-				
-		if Solution.DEBUG:		
+			idx += 1
+
+		if Solution.DEBUG:
 			print(f'idx table: {idx_table}')
 
 		stack = []
@@ -179,13 +178,13 @@ class Solution:
 			curr_state = idx_table[parent_index]
 			parent_index = curr_state[2][2]
 			if Solution.DEBUG:
-				print(f'Parent index: {parent_index}')	
+				print(f'Parent index: {parent_index}')
 				print(f'state: {curr_state}')
 		stack.append(curr_state)
-		
+
 		if Solution.DEBUG:
 			print(stack)
-		
+
 		while len(stack) > 0:
 			item = stack.pop()
 			state = item[1]
@@ -193,20 +192,20 @@ class Solution:
 			h = item[2][1]
 			print(f'{state} h = {h} moves: {g}')
 
-		
+
 
 
 def print_succ(state):
 	Solution.print_succ(state)
 
 def solver(state):
-	Solution.solver(state)	
+	Solution.solver(state)
 
 
 
 
 def main():
-#	state = [1, 2, 3, 4, 5, 6, 7, 0, 8]	
+#	state = [1, 2, 3, 4, 5, 6, 7, 0, 8]
 #	state = [8,7,6,5,4,3,2,1,0]
 #	state = [1,2,3,4,5,0,6,7,8]
 	state = [4,3,8,5,1,6,7,2,0]
